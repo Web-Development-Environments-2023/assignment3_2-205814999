@@ -1,4 +1,4 @@
-var mysql = require('mysql');
+var mysql = require('mysql');//changed to mysql2 not mysql
 require("dotenv").config();
 
 

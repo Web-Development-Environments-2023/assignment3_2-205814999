@@ -2,7 +2,14 @@ var express = require("express");
 var router = express.Router();
 const recipes_utils = require("./utils/recipes_utils");
 
-router.get("/", (req, res) => res.send("im here"));
+router.get("/", async (req, res) => {
+  try {
+    const recipes = await recipes_utils.getAllRecapies();
+    res.send(recipes);//send to client all recipes
+  } catch (error) {
+    res.send(error)
+  }
+});
 
 
 /**
@@ -11,6 +18,15 @@ router.get("/", (req, res) => res.send("im here"));
 router.get("/:recipeId", async (req, res, next) => {
   try {
     const recipe = await recipes_utils.getRecipeDetails(req.params.recipeId);
+    res.send(recipe);
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.post("/search", async (req, res, next) => {
+  try {
+    const recipe = await recipes_utils.getRecipeBySearch(req.body.search);
     res.send(recipe);
   } catch (error) {
     next(error);
