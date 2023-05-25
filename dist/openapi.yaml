@@ -102,17 +102,17 @@ paths:
       description: Get an array of recipes that were saved by a specific user
       responses:
         "200":
-          description: data about the user's favorites recipes returned
+          description: OK
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/RecipePreview'
+                  $ref: '#/components/schemas/Recipe'
         "401":
           description: user is not authorized
         "404":
-        description: page not found.
+          description: page not found.
       security:
       - cookieAuth: []
     post:
@@ -195,7 +195,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/RecipePreview'
+                  $ref: '#/components/schemas/Recipe'
         "400":
           description: Bad request
         "500":
@@ -211,6 +211,8 @@ paths:
           description: page loaded successfully
         "404":
           description: page not found.
+      security:
+       - cookieAuth: []
   /familyrecipes:
     get:
       tags:
@@ -232,7 +234,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/NewRecipe'
+              $ref: '#/components/schemas/Recipe'
       responses:
         "201":
           description: created new recipe successfully
@@ -244,7 +246,7 @@ paths:
     get:
       tags:
       - Recipes
-      summary: Return preview details on recipe by his ID
+      summary: Return All information about the recipe
       description: Return preview details on recipe by his ID
       parameters:
       - name: recipeId
@@ -261,7 +263,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/RecipePreview'
+                $ref: '#/components/schemas/Recipe'
         "404":
           description: recipeId is not exists
 components:
@@ -317,7 +319,7 @@ components:
       example:
         username: my_name
         password: my_name@12
-    NewRecipe:
+    Recipe:
       required:
       - title
       - readyInMinutes
@@ -373,40 +375,6 @@ components:
           description: Amount of servings for the recipe.
           example: 3
       description: Model containing recipe information.
-    RecipePreview:
-      type: object
-      properties:
-        id:
-          type: integer
-          description: recipe identifier
-          example: 102
-        title:
-          type: string
-          description: recipe name
-          example: Simple Macaroni and Cheese
-        image:
-          type: string
-          description: recipe image
-          format: URL
-          example: https://spoonacular.com/recipeimages/655455-566x370.jpg
-        readyInMinutes:
-          type: integer
-          description: the time takes to make this recipe
-          example: 45
-        popularity:
-          type: integer
-          description: how many likes got this recipe
-          example: 5987
-        vegetarian:
-          type: boolean
-          description: indication if the recipe is vegetarian
-          example: false
-        vegan:
-          type: boolean
-          description: indication if the recipe is vegan
-          example: false
-        glutenFree:
-          type: boolean
-          description: indication if the recipe is gluten free
-          example: false
+
+        
   
