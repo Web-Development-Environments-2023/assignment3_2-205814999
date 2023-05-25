@@ -10,17 +10,19 @@ servers:
 # - url: "http://132.72.65.211"
   description: SwaggerHub API Auto Mocking hey
 tags:
+- name: Pages
+  description: Pages of the website.
 - name: Auth
-  description: All authentication related routes
+  description: All authentication related routes.
 - name: Users
-  description: All the user's personal app info
+  description: All User related information.
 - name: Recipes
-  description: All reciepes general info
+  description: All reciepes general info.
 paths:
   /:
     get:
       tags:
-      - home
+      - Pages
       summary: The home page.
       description: displays the home page.
       responses:
@@ -31,7 +33,7 @@ paths:
   /about:
     get:
       tags:
-      - about
+      - Pages
       summary: The about page.
       description: displays the about page.
       responses:
@@ -92,7 +94,7 @@ paths:
       responses:
         "200":
           description: "the user has ben successfully logged out"
-  /users/favorites:
+  /user/favorites:
     get:
       tags:
       - Users
@@ -100,17 +102,17 @@ paths:
       description: Get an array of recipes that were saved by a specific user
       responses:
         "200":
-          description: data about the user's favorites recipes returned
+          description: OK
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/RecipePreview'
+                  $ref: '#/components/schemas/Recipe'
         "401":
           description: user is not authorized
         "404":
-        description: page not found.
+          description: page not found.
       security:
       - cookieAuth: []
     post:
@@ -135,7 +137,7 @@ paths:
           description: user is not authorized
       security:
       - cookieAuth: []
-    /search:
+  /search:
     get:
       tags:
       - Recipes
@@ -193,15 +195,15 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/RecipePreview'
+                  $ref: '#/components/schemas/Recipe'
         "400":
           description: Bad request
         "500":
           description: Internal server error
-  /users/myrecipes:
+  /user/myrecipes:
     get:
       tags:
-      - recipe
+      - Users
       summary: page with all the recipes that the user created.
       description: Shows all the recipes that the user has created.
       responses:
@@ -209,10 +211,12 @@ paths:
           description: page loaded successfully
         "404":
           description: page not found.
+      security:
+       - cookieAuth: []
   /familyrecipes:
     get:
       tags:
-      - recipe
+      - Pages
       summary: page about family recipes
       description: page about family recipes
       responses:
@@ -221,28 +225,28 @@ paths:
         "404":
           description: recpies page not found.
   /user/newrecipe:
-  post:
-    tags:
-    - Recipes
-    summary: Create a new recipe page.
-    description: Page for creating and adding a new recipe to the website.
-    requestBody:
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/newrecipe'
-    responses:
-      "201":
-        description: created new recipe successfully
-      "401":
-        description: not authorized
-      "422":
-        description: invalid parameters
+    post:
+      tags:
+      - Users
+      summary: Create a new recipe page.
+      description: Page for creating and adding a new recipe to the website.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Recipe'
+      responses:
+        "201":
+          description: created new recipe successfully
+        "401":
+          description: not authorized
+        "422":
+          description: invalid parameters
   /recipes/{recipeId}:
     get:
       tags:
       - Recipes
-      summary: Return preview details on recipe by his ID
+      summary: Return All information about the recipe
       description: Return preview details on recipe by his ID
       parameters:
       - name: recipeId
@@ -259,7 +263,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/RecipePreview'
+                $ref: '#/components/schemas/Recipe'
         "404":
           description: recipeId is not exists
 components:
@@ -315,31 +319,30 @@ components:
       example:
         username: my_name
         password: my_name@12
-    newrecipe:
+    Recipe:
       required:
-      - gluten free
-      - has favorited
-      - has watched
-      - recipe make time
+      - title
+      - readyInMinutes
       - recipe name
-      - recipe number of likes
-      - recipe picture
+      - popularity
+      - image
       - vegeterian
+      - vegan
       type: object
       properties:
-        recipe picture:
+        recipe title:
+            type: string
+            description: name or title of the recipe
+            example: Lasanga with meat
+        image:
           type: string
           description: URL for recipe picture
           format: URL
-        recipe name:
+        readyInMinutes:
           type: string
-          description: name or title of the recipe
-          example: Lasanga with meat
-        recipe make time:
-          type: string
-          description: Time in minutes or hours of making the recipe.
+          description: Time in minutes of making the recipe.
           example: 45 min / 2 hour and 15 min.
-        recipe number of likes:
+        popularity:
           type: integer
           description: Number of likes.
           example: 11
@@ -347,17 +350,13 @@ components:
           type: boolean
           description: if the recipe is vegeterian or not.
           example: false
+        vegan:
+          type: boolean
+          description: indication if the recipe is vegan
+          example: false
         gluten free:
           type: boolean
           description: if the recipe is gluten free or not.
-          example: false
-        has watched:
-          type: boolean
-          description: if the dish has been viewed before.
-          example: true
-        has favorited:
-          type: boolean
-          description: if the dish has been saved.
           example: false
         products and quantities:
           type: array
@@ -376,40 +375,6 @@ components:
           description: Amount of servings for the recipe.
           example: 3
       description: Model containing recipe information.
-    RecipePreview:
-      type: object
-      properties:
-        id:
-          type: integer
-          description: recipe identifier
-          example: 102
-        title:
-          type: string
-          description: recipe name
-          example: Simple Macaroni and Cheese
-        image:
-          type: string
-          description: recipe image
-          format: URL
-          example: https://spoonacular.com/recipeimages/655455-566x370.jpg
-        readyInMinutes:
-          type: integer
-          description: the time takes to make this recipe
-          example: 45
-        popularity:
-          type: integer
-          description: how many likes got this recipe
-          example: 5987
-        vegetarian:
-          type: boolean
-          description: indication if the recipe is vegetarian
-          example: false
-        vegan:
-          type: boolean
-          description: indication if the recipe is vegan
-          example: false
-        glutenFree:
-          type: boolean
-          description: indication if the recipe is gluten free
-          example: false
+
+        
   
