@@ -69,7 +69,7 @@ async function getRecipeDetails(recipe_id) {
         vegan: vegan,
         vegetarian: vegetarian,
         glutenFree: glutenFree,
-        instruction : instruction
+        instruction : step
         
     }
 }
