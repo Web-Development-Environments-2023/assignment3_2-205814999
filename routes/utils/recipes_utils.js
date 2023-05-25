@@ -97,65 +97,30 @@ async function extractInstructions(recipes_info) {
   
     for (const recipe_info of recipes_info) {
       let instructions = await getInstructions(recipe_info.id);
-      
-      let data = recipe_info;
-      if (recipe_info.data) {
-        data = recipe_info.data;
+      if (recipe_info.data){
+        let data = getRecipeDetails(recipes_info.id)
       }
+    //   let data = recipe_info;
+    //   if (recipe_info.data) {
+    //     data = recipe_info.data;
+    //   }
       
-      const { id, title, image } = data;
+    //   const { id, title, image } = data;
       arr.push({
-        id: id,
-        title: title,
-        image: image,
+        data : data ,
         instructions: instructions
       });
     }
-  
     return arr;
   }
-  
-//    function extractInstructions(recipes_info ) {
-//     let arr = [];
 
-//     recipes_info.forEach(async (recipe_info , index) => {       
-//         let instructions = await getInstructions(recipe_info.id);
-//         // getInstructions(recipe_info.id).then((res)=>{
-//         //     // console.log(res)
-//         //     instructions = res
-//         // });
-//         // console.log(instructions)
-//         //check the data type so it can work with diffrent types of data
-//         let data = recipe_info;
-//         if (recipe_info.data) {
-//             data = recipe_info.data;
-//         }
-//         const {
-//             id,
-//             title,
-//             image,
-//         } = data;
-//         arr.push({
-//             id: id,
-//             title: title,
-//             image: image,
-//             instructions: instructions
-//         });  
-//         console.log(arr)
-//         if(index == recipes_info.length-1) return arr
-//     })
-//   }
-
-async function getRecipeBySearch(searchResult , number){
+async function getRecipeBySearch(searchResult , limit){
     //https://api.spoonacular.com/recipes/complexSearch?query=pasta&maxFat=25&number=2
-    // if(!num){
-    //     num = 5;
-    // }
     let recapies = await axios.get("https://api.spoonacular.com/recipes/complexSearch", {
         params: {
             includeNutrition: false,
             apiKey: process.env.spooncular_apiKey ,
-            number : number ? number : 5 , //5 by default
+            limit : limit ? limit : 5 , //5 by default
             query : searchResult
         }
     });

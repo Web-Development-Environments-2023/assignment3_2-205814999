@@ -26,7 +26,7 @@ router.get("/:recipeId", async (req, res, next) => {
 
 router.post("/search", async (req, res, next) => {
   try {
-    const recipe = await recipes_utils.getRecipeBySearch(req.body.search, req.body.number);
+    const recipe = await recipes_utils.getRecipeBySearch(req.body.search, req.body.limit, req.body.cusine,);
     
     res.send(recipe);
   } catch (error) {
