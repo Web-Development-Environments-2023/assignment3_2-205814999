@@ -23,10 +23,11 @@ router.get("/:recipeId", async (req, res, next) => {
     next(error);
   }
 });
-
+//, req.body.cuisine, req.body.diet, req.body.intolerance
 router.post("/search", async (req, res, next) => {
   try {
-    const recipe = await recipes_utils.getRecipeBySearch(req.body.search, req.body.limit, req.body.cusine,);
+    const recipe = await recipes_utils.getRecipeBySearch(req.body.search,
+       req.body.limit);
     
     res.send(recipe);
   } catch (error) {
