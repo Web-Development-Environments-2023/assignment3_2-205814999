@@ -200,6 +200,93 @@ paths:
           description: Bad request
         "500":
           description: Internal server error
+  /user/lastwatched:
+    get:
+      tags:
+      - Users
+      summary: returns last 3 watched recipes
+      description:  returns last 3 watched recipes.
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Recipe'
+        "401":
+          description: user is not authorized
+        "404":
+          description: page not found.
+      security:
+      - cookieAuth: []
+    post:
+      tags:
+      - Users
+      summary: save last watched recipe
+      description: save last watched recipe in db
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                reciepeId:
+                  type: string
+                  description: reciepe's id which the user has watched
+                  example: 716429
+      responses:
+        "200":
+          description: The Recipe successfully saved as watched recipe
+        "401":
+          description: user is not authorized
+      security:
+      - cookieAuth: []
+  /recipepopularity/{recipeId}:
+    get:
+      tags:
+      - Recipes
+      summary: return populairty of recipe id
+      description: Return populairty of recipe id
+      parameters:
+      - name: recipeId
+        in: path
+        description: recipe's id
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+      responses:
+        "200":
+          description: populairty of the recipe
+          content:
+            application/json:
+              schema:
+                type: integer
+        "404":
+          description: recipeId is not exists
+    put:
+      tags:
+      - Recipes
+      summary: Update a recipe's popularity
+      description: Update a recipe's popularity.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                popularity:
+                  type: integer
+                  description: new popularity of a recipe.
+                  example: 11
+      responses:
+        "201":
+          description: updated recipe popualrity
+        "422":
+          description: recipeId is not exists
   /user/myrecipes:
     get:
       tags:
@@ -224,7 +311,7 @@ paths:
           description: page loaded successfully
         "404":
           description: recpies page not found.
-  /user/newrecipe:
+  /user/createrecipe:
     post:
       tags:
       - Users
@@ -324,7 +411,6 @@ components:
       - title
       - readyInMinutes
       - recipe name
-      - popularity
       - image
       - vegeterian
       - vegan
@@ -364,7 +450,7 @@ components:
           example: "4 pasta layers, 1 tomato sauce."
           items:
             type: string
-        recipe instructions:
+        instructions:
           type: array
           description: A list of recipe instructions.
           example: "put sauce on first layer, put sauce on second layer."
