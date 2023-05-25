@@ -8,15 +8,434 @@ servers:
 - url: "http://127.0.0.1:3000"
 # remote:
 # - url: "http://132.72.65.211"
-  description: SwaggerHub API Auto Mocking hey
-tags:
-- name: Auth
-  description: All authentication related routes
-- name: Users
-  description: All the user's personal app info
-- name: Recipes
-  description: All reciepes general info
+
+# ##### 3.1 api url #####
+# - description: SwaggerHub API Auto Mocking
+#   url: https://virtserver.swaggerhub.com/IDANGAL2426/asd/1.0.0
+# - url: https://virtserver.swaggerhub.com/RVOLNETS/Ass3ronidanapi/1.0.0
+#   description: SwaggerHub API Auto Mocking
+#   description: SwaggerHub API Auto Mocking hey
+##### 3.1 api url #####
+
+# tags:
+# - name: Auth
+#   description: All authentication related routes
+# - name: Users
+#   description: All the user's personal app info
+# - name: Recipes
+#   description: All reciepes general info
+# - name: About
+#   description: about page
+# ##### 3.1 api tags #####
+# # - name: admins
+# #   description: Secured Admin-only calls
+# # - name: developers
+# #   description: Operations available to regular developers
+# ##### 3.1 api tags #####
+
+#   ##### 3.1 api path #####
+#   paths:
+#   /:
+#     get:
+#       tags:
+#       - home
+#       summary: The home page.
+#       description: displays the home page.
+#       responses:
+#         "200":
+#           description: Home page loaded successfully
+#         "404":
+#           description: Page was not found.
+#   /about:
+#     get:
+#       tags:
+#       - about
+#       summary: The about page.
+#       description: displays the about page.
+#       responses:
+#         "200":
+#           description: About page loaded successfully
+#         "404":
+#           description: Page was not found.
+#   /register:
+#     post:
+#       tags:
+#       - Auth
+#       summary: New user from client created in the server.
+#       description: JSON object containing all details on the user.
+#       requestBody:
+#         description: Item to create
+#         content:
+#           application/json:
+#             schema:
+#               $ref: '#/components/schemas/register'
+#         required: true
+#       responses:
+#         "201":
+#           description: user created
+#         "400":
+#           description: invalid input
+#         "409":
+#           description: an existing user already exists
+#   /login:
+#     post:
+#       tags:
+#       - login
+#       summary: Login to the website
+#       description: login an existing user
+#       requestBody:
+#         content:
+#           application/json:
+#             schema:
+#               $ref: '#/components/schemas/login'
+#       responses:
+#         "200":
+#           description: sucessefully logged in.
+#         "400":
+#           description: wrong login parameters.
+#   /recipes/{id}:
+#     get:
+#       tags:
+#       - recipe
+#       summary: Recipe page.
+#       description: "Show the recipe by id, page with all of it's information"
+#       parameters:
+#       - name: id
+#         in: path
+#         description: ID of recipe to fetch.
+#         required: true
+#         style: simple
+#         explode: false
+#         schema:
+#           type: integer
+#           format: int32
+#       responses:
+#         "200":
+#           description: recipe page loaded successfully.
+#         "404":
+#           description: recipe page was not found.
+#   /search:
+#     get:
+#       tags:
+#       - Recipes
+#       summary: Search for recipes
+#       description: Returns a list of recipes matching the search query
+#       parameters:
+#       - name: q
+#         in: query
+#         description: The search query to match against recipe titles and ingredients
+#         required: true
+#         style: form
+#         explode: true
+#         schema:
+#           type: string
+#       - name: cuisine
+#         in: query
+#         description: Filter recipes by cuisine
+#         required: false
+#         style: form
+#         explode: true
+#         schema:
+#           type: string
+#       - name: diet
+#         in: query
+#         description: Filter recipes by diet
+#         required: false
+#         style: form
+#         explode: true
+#         schema:
+#           type: string
+#       - name: intolerance
+#         in: query
+#         description: Filter recipes by intolerance
+#         required: false
+#         style: form
+#         explode: true
+#         schema:
+#           type: string
+#       - name: limit
+#         in: query
+#         description: The maximum number of recipes to return
+#         required: false
+#         style: form
+#         explode: true
+#         schema:
+#           maximum: 15
+#           minimum: 1
+#           type: integer
+#           default: 5
+#       responses:
+#         "200":
+#           description: OK
+#           content:
+#             application/json:
+#               schema:
+#                 type: array
+#                 items:
+#                   $ref: '#/components/schemas/Recipe'
+#         "400":
+#           description: Bad request
+#         "500":
+#           description: Internal server error
+#   /newrecipe:
+#     post:
+#       tags:
+#       - recipe
+#       summary: Create a new recipe page.
+#       description: Page for creating and adding a new recipe to the website.
+#       requestBody:
+#         content:
+#           application/json:
+#             schema:
+#               $ref: '#/components/schemas/newrecipe'
+#       responses:
+#         "201":
+#           description: created new recipe successfully
+#         "401":
+#           description: not authorized
+#         "422":
+#           description: invalid parameters
+#   /favorites:
+#     get:
+#       tags:
+#       - recipe
+#       summary: page with information about the favorites recipes of the user.
+#       description: Shows all the recipes user has saved in his favorites.
+#       responses:
+#         "200":
+#           description: page loaded successfully
+#         "404":
+#           description: page not found.
+#     post:
+#       tags:
+#       - recipe
+#       summary: Save the recipe in the user favorites.
+#       description: Add a recipe to the user favorites.
+#       requestBody:
+#         content:
+#           application/json:
+#             schema:
+#               $ref: '#/components/schemas/favorites'
+#       responses:
+#         "201":
+#           description: The recipe successfully saved as favorite.
+#         "401":
+#           description: user is not authorized
+#   /myrecipes:
+#     get:
+#       tags:
+#       - recipe
+#       summary: page with all the recipes that the user created.
+#       description: Shows all the recipes that the user has created.
+#       responses:
+#         "200":
+#           description: page loaded successfully
+#         "404":
+#           description: page not found.
+#   /familyrecipes:
+#     get:
+#       tags:
+#       - recipe
+#       summary: page about family recipes
+#       description: page about family recipes
+#       responses:
+#         "200":
+#           description: page loaded successfully
+#         "404":
+#           description: recpies page not found.
+# components:
+#   schemas:
+#     login:
+#       required:
+#       - password
+#       - username
+#       type: object
+#       properties:
+#         username:
+#           type: string
+#           description: username of the user.
+#           example: jamesbond
+#         password:
+#           type: string
+#           description: password of the user.
+#           format: password
+#           example: a!bc3dfg
+#       description: Model containing user name and password.
+#     register:
+#       required:
+#       - country
+#       - email
+#       - first name
+#       - last name
+#       - password
+#       - password confirmation
+#       - username
+#       type: object
+#       properties:
+#         username:
+#           maxLength: 8
+#           minLength: 3
+#           type: string
+#           description: username contains between 3 to 8 letters only
+#           example: jamesbond
+#         first name:
+#           type: string
+#           description: user's first name.
+#           example: james
+#         last name:
+#           type: string
+#           description: user's last name.
+#           example: bond
+#         country:
+#           type: string
+#           description: user's last name.
+#           example: United Kingdom
+#         password:
+#           maxLength: 10
+#           minLength: 5
+#           type: string
+#           description: |
+#             Password length of 5 to 10, at least one number  and special character.
+#           format: password
+#           example: a!bc3dfg
+#         password confirmation:
+#           maxLength: 10
+#           minLength: 5
+#           type: string
+#           description: |
+#             same as password.
+#           format: password
+#           example: a!bc3dfg
+#         email:
+#           type: string
+#           description: user's email address
+#           format: email
+#           example: jamesbond007@gmail.com
+#       description: Model containing user info
+#     newrecipe:
+#       required:
+#       - gluten free
+#       - has favorited
+#       - has watched
+#       - recipe make time
+#       - recipe name
+#       - recipe number of likes
+#       - recipe picture
+#       - vegeterian
+#       type: object
+#       properties:
+#         recipe picture:
+#           type: string
+#           description: URL for recipe picture
+#           format: URL
+#         recipe name:
+#           type: string
+#           description: name or title of the recipe
+#           example: Lasanga with meat
+#         recipe make time:
+#           type: string
+#           description: Time in minutes or hours of making the recipe.
+#           example: 45 min / 2 hour and 15 min.
+#         recipe number of likes:
+#           type: integer
+#           description: Number of likes.
+#           example: 11
+#         vegeterian:
+#           type: boolean
+#           description: if the recipe is vegeterian or not.
+#           example: false
+#         gluten free:
+#           type: boolean
+#           description: if the recipe is gluten free or not.
+#           example: false
+#         has watched:
+#           type: boolean
+#           description: if the dish has been viewed before.
+#           example: true
+#         has favorited:
+#           type: boolean
+#           description: if the dish has been saved.
+#           example: false
+#         products and quantities:
+#           type: array
+#           description: A list of products and quantities.
+#           example: "4 pasta layers, 1 tomato sauce."
+#           items:
+#             type: string
+#         recipe instructions:
+#           type: array
+#           description: A list of recipe instructions.
+#           example: "put sauce on first layer, put sauce on second layer."
+#           items:
+#             type: string
+#         number of servings:
+#           type: integer
+#           description: Amount of servings for the recipe.
+#           example: 3
+#       description: Model containing recipe information.
+#     Recipe:
+#       type: object
+#       properties:
+#         id:
+#           type: integer
+#           description: The recipe ID
+#         title:
+#           type: string
+#           description: The title of the recipe
+#         description:
+#           type: string
+#           description: A brief description of the recipe
+#         ingredients:
+#           type: array
+#           description: A list of ingredients for the recipe
+#           items:
+#             type: string
+#         instructions:
+#           type: string
+#           description: The instructions for preparing the recipe
+#         image_url:
+#           type: string
+#           description: The URL of an image representing the recipe
+#         time_to_prepare:
+#           type: integer
+#           description: The estimated time in minutes required to prepare the recipe
+#         likes:
+#           type: integer
+#           description: The number of users who have liked the recipe
+#         is_vegetarian:
+#           type: boolean
+#           description: Indicates whether the recipe is vegetarian
+#         is_gluten_free:
+#           type: boolean
+#           description: Indicates whether the recipe is gluten-free
+#     favorites:
+#       required:
+#       - recipeID
+#       type: object
+#       properties:
+#         recipeID:
+#           type: integer
+#           description: recipe ID number
+#           example: 42
+  ##### 3.1 api #####
+
+
+
+
+
+
 paths:
+  /about:
+     get:
+       tags:
+       - about
+       summary: The about page.
+       description: displays the about page.
+       responses:
+         "200":
+           description: About page loaded successfully
+         "404":
+           description: Page was not found.
   /register:
     post:
       tags:
