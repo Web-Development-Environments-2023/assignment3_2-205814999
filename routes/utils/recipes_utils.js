@@ -13,8 +13,7 @@ const api_domain = "https://api.spoonacular.com/recipes";
 
 async function getRecipeBySearch(searchResult , limit){
     let info = [];
-    //https://api.spoonacular.com/recipes/complexSearch?query=pasta&maxFat=25&number=2
-    let recapies = await axios.get("https://api.spoonacular.com/recipes/complexSearch", {
+    let recapies = await axios.get(`${api_domain}/complexSearch`, {
         params: {
             includeNutrition: false,
             apiKey: process.env.spooncular_apiKey ,
@@ -22,36 +21,13 @@ async function getRecipeBySearch(searchResult , limit){
             query : searchResult
         }
     });
-    
-    //   console.log("###############################################################################")
-    //   console.log(recapies.data)
-    //   console.log("###############################################################################")
-    //   console.log(recapies.data.results)
-    //   console.log("###############################################################################")
-//    return recapies.data.results
     for (const recipe_info of recapies.data.results) {
         const recipeDetails = await getRecipeDetails(recipe_info.id)
         info.push(recipeDetails)
     }
-    console.log("111111111111111111111111111111111111111111111111111111111111111111111111111")
-    console.log(info)
-    console.log("111111111111111111111111111111111111111111111111111111111111111111111111111")
+    
     return info
-
 }
-
-async function getInst(id){
-    let recapies = await axios.get(`https://api.spoonacular.com/recipes/${id}/analyzedInstructions`, {
-        params: {
-            includeNutrition: false,
-            apiKey: process.env.spooncular_apiKey,
-
-        }
-    });
-    //  console.log(recapies.data[0].steps)
-     return recapies.data[0].steps;
-}
-
 
 async function getRecipeDetails(recipe_id) {
     let recipe_info = await getRecipeInformation(recipe_id);
@@ -75,7 +51,6 @@ async function getRecipeDetails(recipe_id) {
         
     }
 }
-
 async function getRecipeInformation(recipe_id) {
     return await axios.get(`${api_domain}/${recipe_id}/information`, {
         params: {
@@ -85,23 +60,15 @@ async function getRecipeInformation(recipe_id) {
     });
 }
 
-async function getInstruction(id) {
+async function getInstruction(recipe_id) {
     let instructionToReturn = []
-    let instruction = await axios.get(`https://api.spoonacular.com/recipes/${id}/analyzedInstructions`, {
+    let instruction = await axios.get(`${api_domain}/${recipe_id}/analyzedInstructions`, {
         params: {
             includeNutrition: false,
             apiKey: process.env.spooncular_apiKey,
 
         }
         });
-        // console.log("##########################################################################")
-        // console.log(instruction.data)
-        // console.log("##########################################################################")
-        // console.log(instruction.data[0])
-        
-        console.log("33333333333333333333333333333333333333333333333333333333333333333333333")
-        console.log(instruction.data[0].steps);
-        console.log("333333333333333333333333333333333333333333333333333333333333333333333333")
         for (const step of instruction.data[0].steps) {
             const numberOfStep = step.number;
             const textOfInstru = step.step;
@@ -112,38 +79,21 @@ async function getInstruction(id) {
         return instructionToReturn
         }
 
-
-
-        // [2tbsps egg white, 150g flour, 1tsp granulated sugar]
-        async function getIngredientsAndAmountByID(id) {
-            let IngredientsAndAmount = await axios.get(`https://api.spoonacular.com/recipes/${id}/ingredientWidget.json`, {
+        async function getIngredientsAndAmountByID(recipe_id) {
+            let IngredientsAndAmount = await axios.get(`${api_domain}/${recipe_id}/ingredientWidget.json`, {
                 params: {
                     includeNutrition: false,
                     apiKey: process.env.spooncular_apiKey
                 }
             });
-            // console.log("@4444444444444444444444444444444444444444444444444444444")
-            // console.log(IngredientsAndAmount.data)
-            // console.log("@@4444444444444444444444444444444444444444444444444444444")
-            // console.log(IngredientsAndAmount.data.ingredients)
-            // console.log("@@@4444444444444444444444444444444444444444444444444444444")
-            // console.log(IngredientsAndAmount.data.ingredients[0].amount)
-            // console.log("@@@@4444444444444444444444444444444444444444444444444444444")
             const unit = await IngredientsAndAmount.data.ingredients[0].amount.metric.unit;
-            // console.log("@@@@@4444444444444444444444444444444444444444444444444444444")
             const value = await IngredientsAndAmount.data.ingredients[0].amount.metric.value;
-            // const unitAndValue = await value + unit;
-            // console.log("@@@@@4@444444444444444444444444444444444444444444444444444444")
-            // console.log(unitAndValue);
             const name = await IngredientsAndAmount.data.ingredients[0].name;
             const unitValueAndName = await value + unit + " " + name;
-            // console.log(unitValueAndName);
+
             return unitValueAndName;
-
-
         }
         
-        // https://api.spoonacular.com/recipes/{id}/information
         async function getServings(recipe_id) {
             let info = await axios.get(`${api_domain}/${recipe_id}/information`, {
                 params: {
@@ -151,12 +101,17 @@ async function getInstruction(id) {
                     apiKey: process.env.spooncular_apiKey
                 }
             });
-            console.log(info.data);
-            console.log("555555555555555555555555555555555555555555555555")
-            console.log(info.data.servings);
-            console.log("555555555555555555555555555555555555555555555555")
+    
             return info.data.servings;
         }
+
+    exports.getRecipeDetails = getRecipeDetails;
+    // exports.getAllRecapies = getAllRecapies;
+    exports.getRecipeBySearch = getRecipeBySearch;
+        
+
+
+
 
 
 
@@ -168,51 +123,52 @@ async function getInstruction(id) {
 
 
         
+    
 
-async function getAllRecapies() {
+// async function getAllRecapies() {
 
-    let recapies = await axios.get("https://api.spoonacular.com/recipes/random", {
-        params: {
-            includeNutrition: false,
-            apiKey: process.env.spooncular_apiKey ,
-            number : 1
-        }
-    });
-    const info = extractPreviewRecipeDetails(recapies.data.recipes)
-    // console.log(recapies.data.recipes.length)
-    return info
+//     let recapies = await axios.get("https://api.spoonacular.com/recipes/random", {
+//         params: {
+//             includeNutrition: false,
+//             apiKey: process.env.spooncular_apiKey ,
+//             number : 1
+//         }
+//     });
+//     const info = extractPreviewRecipeDetails(recapies.data.recipes)
+//     // console.log(recapies.data.recipes.length)
+//     return info
    
-}
+// }
 
-function extractPreviewRecipeDetails(recipes_info) {
-    return recipes_info.map(async (recipe_info) => {
-        //check the data type so it can work with diffrent types of data
-        let data = recipe_info;
-        if (recipe_info.data) {
-            data = recipe_info.data;
-        }
-        const {
-            id,
-            title,
-            readyInMinutes,
-            image,
-            aggregateLikes,
-            vegan,
-            vegetarian,
-            glutenFree,
-        } = data;
-        return {
-            id: id,
-            title: title,
-            image: image,
-            readyInMinutes: readyInMinutes,
-            popularity: aggregateLikes,
-            vegan: vegan,
-            vegetarian: vegetarian,
-            glutenFree: glutenFree , 
-        }
-    })
-  }
+// function extractPreviewRecipeDetails(recipes_info) {
+//     return recipes_info.map(async (recipe_info) => {
+//         //check the data type so it can work with diffrent types of data
+//         let data = recipe_info;
+//         if (recipe_info.data) {
+//             data = recipe_info.data;
+//         }
+//         const {
+//             id,
+//             title,
+//             readyInMinutes,
+//             image,
+//             aggregateLikes,
+//             vegan,
+//             vegetarian,
+//             glutenFree,
+//         } = data;
+//         return {
+//             id: id,
+//             title: title,
+//             image: image,
+//             readyInMinutes: readyInMinutes,
+//             popularity: aggregateLikes,
+//             vegan: vegan,
+//             vegetarian: vegetarian,
+//             glutenFree: glutenFree , 
+//         }
+//     })
+//   }
   
     
 // return recapies.data[0].steps;
@@ -240,8 +196,5 @@ function extractPreviewRecipeDetails(recipes_info) {
 //     return arr;
 //   }
 
-exports.getRecipeDetails = getRecipeDetails;
-exports.getAllRecapies = getAllRecapies;
-exports.getRecipeBySearch = getRecipeBySearch;
 
 
