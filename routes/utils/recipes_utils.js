@@ -11,14 +11,18 @@ const api_domain = "https://api.spoonacular.com/recipes";
 
 
 
-async function getRecipeBySearch(searchResult , limit){
+async function getRecipeBySearch(searchResult , limit, cuisine, diet, intolerance){
     let info = [];
     let recapies = await axios.get(`${api_domain}/complexSearch`, {
         params: {
             includeNutrition: false,
             apiKey: process.env.spooncular_apiKey ,
-            number : 1 , //5 by default
-            query : searchResult
+            limit: limit ? limit : 5, //5 by default
+            query : searchResult,
+            cuisine : cuisine,
+            diet : diet,
+            intolerance : intolerance
+
         }
     });
     for (const recipe_info of recapies.data.results) {

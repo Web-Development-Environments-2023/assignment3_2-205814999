@@ -27,7 +27,7 @@ router.get("/:recipeId", async (req, res, next) => {
 router.post("/search", async (req, res, next) => {
   try {
     const recipe = await recipes_utils.getRecipeBySearch(req.body.search,
-       req.body.limit);
+      req.body.limit, req.body.cuisine, req.body.diet. req.body.intolerance);
     
     res.send(recipe);
   } catch (error) {
