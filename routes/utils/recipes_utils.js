@@ -9,14 +9,7 @@ const api_domain = "https://api.spoonacular.com/recipes";
  */
 //, cuisine, diet, intolerance
 
-async function getRecipeInformation(recipe_id) {
-    return await axios.get(`${api_domain}/${recipe_id}/information`, {
-        params: {
-            includeNutrition: false,
-            apiKey: process.env.spooncular_apiKey
-        }
-    });
-}
+
 
 async function getRecipeBySearch(searchResult , limit){
     let info = [];
@@ -25,22 +18,29 @@ async function getRecipeBySearch(searchResult , limit){
         params: {
             includeNutrition: false,
             apiKey: process.env.spooncular_apiKey ,
-            limit : limit ? limit : 2 , //5 by default
+            number : 1 , //5 by default
             query : searchResult
         }
     });
-      console.log(recapies.data.results)
+    
+    //   console.log("###############################################################################")
+    //   console.log(recapies.data)
+    //   console.log("###############################################################################")
+    //   console.log(recapies.data.results)
+    //   console.log("###############################################################################")
 //    return recapies.data.results
     for (const recipe_info of recapies.data.results) {
         const recipeDetails = await getRecipeDetails(recipe_info.id)
         info.push(recipeDetails)
     }
-    // console.log(info)
+    console.log("111111111111111111111111111111111111111111111111111111111111111111111111111")
+    console.log(info)
+    console.log("111111111111111111111111111111111111111111111111111111111111111111111111111")
     return info
 
 }
 
-async function getInstructions(id){
+async function getInst(id){
     let recapies = await axios.get(`https://api.spoonacular.com/recipes/${id}/analyzedInstructions`, {
         params: {
             includeNutrition: false,
@@ -56,10 +56,10 @@ async function getInstructions(id){
 async function getRecipeDetails(recipe_id) {
     let recipe_info = await getRecipeInformation(recipe_id);
     let { id, title, readyInMinutes, image, aggregateLikes, vegan, vegetarian, glutenFree } = recipe_info.data;
-    let instruction = await getInstructions(recipe_id);
-    //let { number, step } = instruction;
-    let step = instruction.step
-    // console.log(instruction);
+    let instruction = await getInstruction(recipe_id);
+    let ingredientsAndAmount = await getIngredientsAndAmountByID(recipe_id);
+    let servings = await getServings(recipe_id);
+
     return {
         id: id,
         title: title,
@@ -69,10 +69,105 @@ async function getRecipeDetails(recipe_id) {
         vegan: vegan,
         vegetarian: vegetarian,
         glutenFree: glutenFree,
-        instruction : step
+        instruction : instruction,
+        ingredients : ingredientsAndAmount,
+        numberOfServings : servings
         
     }
 }
+
+async function getRecipeInformation(recipe_id) {
+    return await axios.get(`${api_domain}/${recipe_id}/information`, {
+        params: {
+            includeNutrition: false,
+            apiKey: process.env.spooncular_apiKey
+        }
+    });
+}
+
+async function getInstruction(id) {
+    let instructionToReturn = []
+    let instruction = await axios.get(`https://api.spoonacular.com/recipes/${id}/analyzedInstructions`, {
+        params: {
+            includeNutrition: false,
+            apiKey: process.env.spooncular_apiKey,
+
+        }
+        });
+        // console.log("##########################################################################")
+        // console.log(instruction.data)
+        // console.log("##########################################################################")
+        // console.log(instruction.data[0])
+        
+        console.log("33333333333333333333333333333333333333333333333333333333333333333333333")
+        console.log(instruction.data[0].steps);
+        console.log("333333333333333333333333333333333333333333333333333333333333333333333333")
+        for (const step of instruction.data[0].steps) {
+            const numberOfStep = step.number;
+            const textOfInstru = step.step;
+            const compliteInstru = numberOfStep + ". " + textOfInstru;
+            instructionToReturn.push(compliteInstru);
+        
+        }
+        return instructionToReturn
+        }
+
+
+
+        // [2tbsps egg white, 150g flour, 1tsp granulated sugar]
+        async function getIngredientsAndAmountByID(id) {
+            let IngredientsAndAmount = await axios.get(`https://api.spoonacular.com/recipes/${id}/ingredientWidget.json`, {
+                params: {
+                    includeNutrition: false,
+                    apiKey: process.env.spooncular_apiKey
+                }
+            });
+            // console.log("@4444444444444444444444444444444444444444444444444444444")
+            // console.log(IngredientsAndAmount.data)
+            // console.log("@@4444444444444444444444444444444444444444444444444444444")
+            // console.log(IngredientsAndAmount.data.ingredients)
+            // console.log("@@@4444444444444444444444444444444444444444444444444444444")
+            // console.log(IngredientsAndAmount.data.ingredients[0].amount)
+            // console.log("@@@@4444444444444444444444444444444444444444444444444444444")
+            const unit = await IngredientsAndAmount.data.ingredients[0].amount.metric.unit;
+            // console.log("@@@@@4444444444444444444444444444444444444444444444444444444")
+            const value = await IngredientsAndAmount.data.ingredients[0].amount.metric.value;
+            // const unitAndValue = await value + unit;
+            // console.log("@@@@@4@444444444444444444444444444444444444444444444444444444")
+            // console.log(unitAndValue);
+            const name = await IngredientsAndAmount.data.ingredients[0].name;
+            const unitValueAndName = await value + unit + " " + name;
+            // console.log(unitValueAndName);
+            return unitValueAndName;
+
+
+        }
+        
+        // https://api.spoonacular.com/recipes/{id}/information
+        async function getServings(recipe_id) {
+            let info = await axios.get(`${api_domain}/${recipe_id}/information`, {
+                params: {
+                    includeNutrition: false,
+                    apiKey: process.env.spooncular_apiKey
+                }
+            });
+            console.log(info.data);
+            console.log("555555555555555555555555555555555555555555555555")
+            console.log(info.data.servings);
+            console.log("555555555555555555555555555555555555555555555555")
+            return info.data.servings;
+        }
+
+
+
+
+
+
+
+
+
+
+        
 
 async function getAllRecapies() {
 
@@ -80,11 +175,11 @@ async function getAllRecapies() {
         params: {
             includeNutrition: false,
             apiKey: process.env.spooncular_apiKey ,
-            number : 15
+            number : 1
         }
     });
     const info = extractPreviewRecipeDetails(recapies.data.recipes)
-    console.log(recapies.data.recipes.length)
+    // console.log(recapies.data.recipes.length)
     return info
    
 }
@@ -118,7 +213,9 @@ function extractPreviewRecipeDetails(recipes_info) {
         }
     })
   }
-
+  
+    
+// return recapies.data[0].steps;
   
 // async function extractInstructions(recipes_info) {
 //     let arr = [];
