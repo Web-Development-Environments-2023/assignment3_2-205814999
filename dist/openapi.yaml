@@ -17,7 +17,7 @@ tags:
 - name: Users
   description: All User related information.
 - name: Recipes
-  description: All reciepes general info.
+  description: All recipes general info.
 paths:
   /:
     get:
@@ -94,7 +94,7 @@ paths:
       responses:
         "200":
           description: "the user has ben successfully logged out"
-  /user/favorites:
+  /users/favorites:
     get:
       tags:
       - Users
@@ -126,9 +126,9 @@ paths:
             schema:
               type: object
               properties:
-                reciepeId:
+                recipeId:
                   type: string
-                  description: reciepe's id which the user saved
+                  description: recipe's id which the user saved
                   example: 716429
       responses:
         "200":
@@ -200,7 +200,7 @@ paths:
           description: Bad request
         "500":
           description: Internal server error
-  /user/lastwatched:
+  /users/lastwatched:
     get:
       tags:
       - Users
@@ -232,9 +232,9 @@ paths:
             schema:
               type: object
               properties:
-                reciepeId:
+                recipeId:
                   type: string
-                  description: reciepe's id which the user has watched
+                  description: recipe's id which the user has watched
                   example: 716429
       responses:
         "200":
@@ -243,51 +243,7 @@ paths:
           description: user is not authorized
       security:
       - cookieAuth: []
-  /recipepopularity/{recipeId}:
-    get:
-      tags:
-      - Recipes
-      summary: return populairty of recipe id
-      description: Return populairty of recipe id
-      parameters:
-      - name: recipeId
-        in: path
-        description: recipe's id
-        required: true
-        style: simple
-        explode: false
-        schema:
-          type: integer
-      responses:
-        "200":
-          description: populairty of the recipe
-          content:
-            application/json:
-              schema:
-                type: integer
-        "404":
-          description: recipeId is not exists
-    put:
-      tags:
-      - Recipes
-      summary: Update a recipe's popularity
-      description: Update a recipe's popularity.
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                popularity:
-                  type: integer
-                  description: new popularity of a recipe.
-                  example: 11
-      responses:
-        "201":
-          description: updated recipe popualrity
-        "422":
-          description: recipeId is not exists
-  /user/myrecipes:
+  /users/myrecipes:
     get:
       tags:
       - Users
@@ -311,7 +267,7 @@ paths:
           description: page loaded successfully
         "404":
           description: recpies page not found.
-  /user/createrecipe:
+  /users/createrecipe:
     post:
       tags:
       - Users
@@ -321,7 +277,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Recipe'
+              $ref: '#/components/schemas/NewRecipe'
       responses:
         "201":
           description: created new recipe successfully
@@ -333,7 +289,7 @@ paths:
     get:
       tags:
       - Recipes
-      summary: Return All information about the recipe
+      summary: Return preview information about the recipe
       description: Return preview details on recipe by his ID
       parameters:
       - name: recipeId
@@ -353,6 +309,121 @@ paths:
                 $ref: '#/components/schemas/Recipe'
         "404":
           description: recipeId is not exists
+  /recipes/{recipeId}/instructions:
+    get:
+      tags:
+      - Recipes
+      summary: Return instrunctions of the recipe
+      description: Return array where each element is an instruction.
+      parameters:
+      - name: recipeId
+        in: path
+        description: recipe's id
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+      responses:
+        "200":
+          description: array of strings of instructions.
+          content:
+            application/json:
+              schema:
+                type: array
+                description: A list of recipe instructions.
+                example: "put sauce on first layer, put sauce on second layer."
+                items:
+                  type: string
+        "404":
+          description: recipeId is not exists.
+        "500":
+          description: Instructions do not exist.
+  /recipes/{recipeId}/ingredients:
+    get:
+      tags:
+      - Recipes
+      summary: Return Ingredients  of the recipe
+      description: Return array where each element is an Ingredient.
+      parameters:
+      - name: recipeId
+        in: path
+        description: recipe's id
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+      responses:
+        "200":
+          description: array of strings of Ingredients.
+          content:
+            application/json:
+              schema:
+                type: array
+                description: A list of recipe Ingredients.
+                example: "200ml milk, 15g butter."
+                items:
+                  type: string'
+        "404":
+          description: recipeId is not exists.
+        "500":
+          description: Ingredients do not exist.
+  /recipes/{recipeId}/servings:
+    get:
+      tags:
+      - Recipes
+      summary: Return number of servings  of the recipe
+      description:  Return number of servings  of the recipe
+      parameters:
+      - name: recipeId
+        in: path
+        description: recipe's id
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+      responses:
+        "200":
+          description: number of servings
+          content:
+            application/json:
+              schema:
+                type: object
+                description: number of servings.
+                example: "4"
+        "404":
+          description: recipeId is not exists.
+  /users/updatelikes:
+    put:
+      tags:
+      - Users
+      summary: Update a recipe's popularity
+      description: Update a recipe's popularity.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                recipeId:
+                  type: integer
+                  description: recipe ID to update
+                  example: 324694
+                action:
+                  type: integer
+                  description: 1 to increment by 1 and 0 to decrement by 1.
+                  example: 1
+      responses:
+        "200":
+          description: updated recipe popualrity
+        "422":
+          description: recipeId is not exists
+        "401":
+          description: user is not authorized
+      security:
+      - cookieAuth: []
 components:
   schemas:
     User:
@@ -410,13 +481,16 @@ components:
       required:
       - title
       - readyInMinutes
-      - recipe name
       - image
       - vegeterian
       - vegan
       type: object
       properties:
-        recipe title:
+        id:
+            type: integer
+            description: id of the recipe
+            example: 716429
+        title:
             type: string
             description: name or title of the recipe
             example: Lasanga with meat
@@ -444,22 +518,60 @@ components:
           type: boolean
           description: if the recipe is gluten free or not.
           example: false
-        products and quantities:
-          type: array
-          description: A list of products and quantities.
-          example: "4 pasta layers, 1 tomato sauce."
-          items:
+      description: Model containing recipe information.
+    NewRecipe:
+      required:
+      - title
+      - readyInMinutes
+      - recipe name
+      - image
+      - vegeterian
+      - vegan
+      - instructions
+      - ingridients
+      - servings
+      type: object
+      properties:
+        title:
             type: string
+            description: name or title of the recipe
+            example: Lasanga with meat
+        image:
+          type: string
+          description: URL for recipe picture
+          format: URL
+        readyInMinutes:
+          type: integer
+          description: Time in minutes of making the recipe.
+          example: 120
+        vegeterian:
+          type: boolean
+          description: if the recipe is vegeterian or not.
+          example: 0
+        vegan:
+          type: boolean
+          description: indication if the recipe is vegan
+          example: 1
+        gluten_free:
+          type: boolean
+          description: if the recipe is gluten free or not.
+          example: 0
+        servings:
+          type: integer
+          description: number of servings
+          example: 3
         instructions:
           type: array
-          description: A list of recipe instructions.
-          example: "put sauce on first layer, put sauce on second layer."
+          description: recipe instructions array
+          example: [1.Bake at 300, 2.mix blah blah]
           items:
-            type: string
-        number of servings:
-          type: integer
-          description: Amount of servings for the recipe.
-          example: 3
+                type: string
+        ingridients:
+          type: array
+          description: recipe ingridients array
+          example: [2tbsp butter, 300ml milk]
+          items:
+                type: string
       description: Model containing recipe information.
 
         

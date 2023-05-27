@@ -4,9 +4,10 @@ DROP TABLE IF EXISTS favorite_recipes;
 DROP TABLE IF EXISTS created_recipes;
 DROP TABLE IF EXISTS watched_recipes;
 DROP TABLE IF EXISTS recipes_popularity;
-DROP TABLE IF EXISTS user_recipes_popularity
+DROP TABLE IF EXISTS user_recipes_popularity;
+
 CREATE TABLE users(  
-    id int NOT NULL PRIMARY KEY AUTO_INCREMENT COMMENT 'Primary Key',
+    user_id int NOT NULL PRIMARY KEY AUTO_INCREMENT COMMENT 'Primary Key',
     username VARCHAR(255),
     firstname VARCHAR(255),
     lastname VARCHAR(255),
@@ -29,16 +30,16 @@ CREATE TABLE created_recipes(
     vegeterian BOOLEAN,
     vegan BOOLEAN,
     gluten_free BOOLEAN,
-    products_and_quantities JSON,
+    ingridients JSON,
     instructions JSON,
-    number_of_servings INT
+    servings INT
 );
 
 CREATE TABLE watched_recipes(  
   watched_recipe_id int NOT NULL PRIMARY KEY AUTO_INCREMENT COMMENT 'Primary Key',
   user_id INT NOT NULL,
   recipe_id INT NOT NULL,
-  watched_at DATETIME NOT NULL
+  watched_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE recipes_popularity(  
