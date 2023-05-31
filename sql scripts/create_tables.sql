@@ -1,4 +1,3 @@
-
 DROP TABLE IF EXISTS users;
 DROP TABLE IF EXISTS favorite_recipes;
 DROP TABLE IF EXISTS created_recipes;
@@ -17,10 +16,11 @@ CREATE TABLE users(
 );
 
 CREATE TABLE favorite_recipes (
-  favorite_recipe_id int NOT NULL PRIMARY KEY AUTO_INCREMENT COMMENT 'Primary Key',
   user_id INT NOT NULL,
-  recipe_id INT NOT NULL
+  recipe_id INT NOT NULL,
+  PRIMARY KEY (user_id, recipe_id)
 );
+
 CREATE TABLE created_recipes(  
     created_recipe_id int NOT NULL PRIMARY KEY AUTO_INCREMENT COMMENT 'Primary Key',
     user_id INT NOT NULL,
@@ -48,7 +48,7 @@ CREATE TABLE recipes_popularity(
 );
 
 CREATE TABLE user_recipes_popularity(  
-  popular_recipe_id int NOT NULL PRIMARY KEY AUTO_INCREMENT COMMENT 'Primary Key',
   user_id INT NOT NULL,
-  recipe_id INT NOT NULL
+  recipe_id INT NOT NULL,
+  PRIMARY KEY (user_id, recipe_id)
 );

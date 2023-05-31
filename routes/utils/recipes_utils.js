@@ -10,26 +10,36 @@ const api_domain = "https://api.spoonacular.com/recipes";
  */
 //, cuisine, diet, intolerance
 
-async function getRecipeBySearch(searchResult , limit, cuisine, diet, intolerance){
+async function getRecipeBySearch(query , limit, cuisine, diet, intolerance){
     let info = [];
-    let recapies = await axios.get(`${api_domain}/complexSearch`, {
-        params: {
-            includeNutrition: false,
-            apiKey: process.env.spooncular_apiKey ,
-            limit: limit ? limit : 5, //5 by default
-            query : searchResult,
-            cuisine : cuisine,
-            diet : diet,
-            intolerance : intolerance
-
-        }
-    });
-    for (const recipe_info of recapies.data.results) {
-        const recipeDetails = await getRecipeDetails(recipe_info.id)
-        info.push(recipeDetails)
+    let queryParams = {
+      includeNutrition: false,
+      apiKey: process.env.spooncular_apiKey,
+      number: limit || 5, // 5 by default
+      query: query,
+    };
+  
+    // Add optional parameters if provided
+    if (cuisine) {
+      queryParams.cuisine = cuisine;
     }
-    
-    return info
+    if (diet) {
+      queryParams.diet = diet;
+    }
+    if (intolerance) {
+      queryParams.intolerances = intolerance;
+    }
+  
+    let recapies = await axios.get(`${api_domain}/complexSearch`, {
+      params: queryParams,
+    });
+  
+    for (const recipe_info of recapies.data.results) {
+      const recipeDetails = await getRecipeDetails(recipe_info.id);
+      info.push(recipeDetails);
+    }
+  
+    return info;
 }
 
 async function getRecipeDetailsArr(recipes_id) {
@@ -117,12 +127,29 @@ async function getServings(recipe_id) {
     return {number_of_servings:servings};
 }
 
+async function getRandomRecipes() {
+        let recapies = await axios.get(`${api_domain}/random`, {
+        params: {
+            includeNutrition: false,
+            apiKey: process.env.spooncular_apiKey ,
+            number : 3
+        }
+    });
+    let info = [];
+    for (const recipe_info of recapies.data.recipes) {
+        const recipeDetails = await getRecipeDetails(recipe_info.id);
+        info.push(recipeDetails);
+      }
+    return info
+}
+
 exports.getRecipeDetails = getRecipeDetails;
 exports.getRecipeBySearch = getRecipeBySearch;
 exports.getInstructions = getInstructions;
 exports.getIngredientsAndAmountByID = getIngredientsAndAmountByID;
 exports.getServings = getServings;
 exports.getRecipeDetailsArr = getRecipeDetailsArr;
+exports.getRandomRecipes = getRandomRecipes;
         
 
 

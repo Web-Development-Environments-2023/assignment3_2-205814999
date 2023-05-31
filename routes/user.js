@@ -29,8 +29,60 @@ router.post('/favorites', async (req,res,next) => {
   try{
     const user_id = req.session.user_id;
     const recipe_id = req.body.recipeId;
+    const isFavorited = await user_utils.checkIfFavorite(user_id,recipe_id);
+    if(isFavorited){
+      throw { status: 409, message: "Already favorited." };
+    }
     await user_utils.markAsFavorite(user_id,recipe_id);
     res.status(200).send("The Recipe successfully saved as favorite");
+    } catch(error){
+    next(error);
+  }
+})
+
+/**
+ * This path gets body with recipeId and save this recipe in the favorites list of the logged-in user
+ */
+router.delete('/favorites', async (req,res,next) => {
+  try{
+    const user_id = req.session.user_id;
+    const recipe_id = req.body.recipeId;
+    await user_utils.removeAsFavorite(user_id,recipe_id);
+    res.status(200).send("The Recipe Removed as favorite");
+    } catch(error){
+    next(error);
+  }
+})
+
+/**
+ * This path gets body with recipeId and save this recipe in the favorites list of the logged-in user
+ */
+router.post('/liked', async (req,res,next) => {
+  try{
+    const user_id = req.session.user_id;
+    const recipe_id = req.body.recipeId;
+    const isLiked = await user_utils.checkIfLiked(user_id,recipe_id);
+    if(isLiked){
+      throw { status: 409, message: "The Recipe is already marked as liked." };
+    }
+    await user_utils.markAsLiked(user_id,recipe_id);
+    await user_utils.updateRecipePopularity(recipe_id,'increment');
+    res.status(200).send("The Recipe popularity successfully updated.");
+    } catch(error){
+    next(error);
+  }
+})
+
+/**
+ * This path gets body with recipeId and save this recipe in the favorites list of the logged-in user
+ */
+router.delete('/liked', async (req,res,next) => {
+  try{
+    const user_id = req.session.user_id;
+    const recipe_id = req.body.recipeId;
+    await user_utils.removeAsLiked(user_id,recipe_id);
+    await user_utils.updateRecipePopularity(recipe_id,'decrement');
+    res.status(200).send("The Recipe popularity successfully updated.");
     } catch(error){
     next(error);
   }
@@ -98,15 +150,19 @@ router.get('/myrecipes', async (req,res,next) => {
   }
 });
 
-router.put("/updatelikes", async (req, res, next) => {
-  try {
+router.get('/myrecipes', async (req,res,next) => {
+  try{
     const user_id = req.session.user_id;
-    await user_utils.updateRecipePopularity(user_id,req.body.recipeId,req.body.action);
-    res.status(200).send("Updated reciep's popularity.");
-  } catch (error) {
-    next(error);
+    const recipes_id = await user_utils.getMyRecipes(user_id);
+    let recipes_id_array = [];
+    // recipes_id.map((element) => recipes_id_array.push(element.recipe_id)); //extracting the recipe ids into array
+    // const results = await recipe_utils.getRecipeDetailsArr(recipes_id_array);
+    res.status(200).send(recipes_id);
+  } catch(error){
+    next(error); 
   }
 });
+
 
 /**
  * This path gets body with recipeId and save this recipe in the watched list of the logged-in user
