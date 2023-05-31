@@ -23,22 +23,11 @@ paths:
     get:
       tags:
       - Pages
-      summary: The home page.
+      summary: Returns the single-page html.
       description: displays the home page.
       responses:
         "200":
-          description: Home page loaded successfully
-        "404":
-          description: Page was not found.
-  /about:
-    get:
-      tags:
-      - Pages
-      summary: The about page.
-      description: displays the about page.
-      responses:
-        "200":
-          description: About page loaded successfully
+          description: page loaded successfully
         "404":
           description: Page was not found.
   /register:
@@ -48,7 +37,7 @@ paths:
       summary: A new user from the client is added to the server
       description: A JSON object contains all the details about the new user.
       requestBody:
-        description: Inventory item to add
+        description: user to add
         content:
           application/json:
             schema:
@@ -60,7 +49,7 @@ paths:
         "400":
           description: wrong input parameters
         "409":
-        description: an existing user already exists
+          description: an existing user already exists
   /login:
     post:
       tags:
@@ -132,19 +121,43 @@ paths:
                   example: 716429
       responses:
         "200":
-          description: The Recipe successfully saved as favorite
+          description: The Recipe successfully saved as favorite.
+        "409":
+          description: The Recipe is already marked as favorite.
+        "401":
+          description: user is not authorized.
+      security:
+      - cookieAuth: []
+    delete:
+      tags:
+      - Users
+      summary: remove a recipe from favorites of a user
+      description: remove a recipe from favorites of a user
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                recipeId:
+                  type: string
+                  description: recipe's id which the user saved
+                  example: 716429
+      responses:
+        "200":
+          description: The Recipe successfully Removed as favorite
         "401":
           description: user is not authorized
       security:
       - cookieAuth: []
-  /search:
+  /recipes/recipe/search:
     get:
       tags:
       - Recipes
       summary: Search for recipes
       description: Returns a list of recipes matching the search query
       parameters:
-      - name: q
+      - name: query
         in: query
         description: The search query to match against recipe titles and ingredients
         required: true
@@ -200,6 +213,25 @@ paths:
           description: Bad request
         "500":
           description: Internal server error
+  /recipes/recipe/random:
+    get:
+      tags:
+      - Recipes
+      summary: returns preview information of random 3 recipes.
+      description:  returns array of random 3 recipes.
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Recipe'
+        "404":
+          description: page not found.
+        "500":
+          description: Internal server error
   /users/lastwatched:
     get:
       tags:
@@ -252,21 +284,27 @@ paths:
       responses:
         "200":
           description: page loaded successfully
+        "401":
+          description: not authorized
         "404":
           description: page not found.
       security:
        - cookieAuth: []
-  /familyrecipes:
+  /users/familyrecipes:
     get:
       tags:
-      - Pages
+      - Users
       summary: page about family recipes
       description: page about family recipes
       responses:
         "200":
           description: page loaded successfully
+        "401":
+          description: not authorized
         "404":
           description: recpies page not found.
+      security:
+      - cookieAuth: []
   /users/createrecipe:
     post:
       tags:
@@ -285,6 +323,8 @@ paths:
           description: not authorized
         "422":
           description: invalid parameters
+      security:
+      - cookieAuth: []
   /recipes/{recipeId}:
     get:
       tags:
@@ -332,7 +372,7 @@ paths:
               schema:
                 type: array
                 description: A list of recipe instructions.
-                example: "put sauce on first layer, put sauce on second layer."
+                example: ["1.put sauce on first layer", "2.put sauce on second layer."]
                 items:
                   type: string
         "404":
@@ -362,7 +402,7 @@ paths:
               schema:
                 type: array
                 description: A list of recipe Ingredients.
-                example: "200ml milk, 15g butter."
+                example: ["200ml milk","15g butter."]
                 items:
                   type: string'
         "404":
@@ -395,12 +435,12 @@ paths:
                 example: "4"
         "404":
           description: recipeId is not exists.
-  /users/updatelikes:
-    put:
+  /users/liked:
+    post:
       tags:
       - Users
-      summary: Update a recipe's popularity
-      description: Update a recipe's popularity.
+      summary: mark the recipe as liked for the user and INCREMENT recipe's popularity by 1
+      description: mark the recipe as liked for the user and INCREMENT recipe's popularity by 1
       requestBody:
         content:
           application/json:
@@ -408,18 +448,36 @@ paths:
               type: object
               properties:
                 recipeId:
-                  type: integer
-                  description: recipe ID to update
-                  example: 324694
-                action:
-                  type: integer
-                  description: 1 to increment by 1 and 0 to decrement by 1.
-                  example: 1
+                  type: string
+                  description: recipe's id which the user saved
+                  example: 716429
       responses:
         "200":
-          description: updated recipe popualrity
-        "422":
-          description: recipeId is not exists
+          description: The Recipe popularity successfully updated.
+        "409":
+          description: The Recipe is already marked as liked.
+        "401":
+          description: user is not authorized.
+      security:
+      - cookieAuth: []
+    delete:
+      tags:
+      - Users
+      summary: unmark the recipe as liked for the user and DECREMENT recipe's popularity by 1
+      description: unmark the recipe as liked for the user and DECREMENT recipe's popularity by 1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                recipeId:
+                  type: string
+                  description: recipe's id which the user saved
+                  example: 716429
+      responses:
+        "200":
+          description: The Recipe popularity successfully updated.
         "401":
           description: user is not authorized
       security:
